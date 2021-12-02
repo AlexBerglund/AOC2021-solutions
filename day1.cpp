@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <thread>
 
 int part1(const std::vector<int>& input) {
 
