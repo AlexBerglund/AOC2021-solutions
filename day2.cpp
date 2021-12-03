@@ -48,7 +48,7 @@ int part2(vector<tuple<string, int>>& input) {
 int main() {
     
     fstream f("day2_input.txt");
-    
+
     string direction;
     int value;
     vector<tuple<string, int>> input;
