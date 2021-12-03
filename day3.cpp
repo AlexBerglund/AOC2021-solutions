@@ -16,7 +16,7 @@ int part1(const vector<int>& input) {
         
         for (int j = 0; j < input.size(); j++) {
             bit = (input.at(j) >> i) & 1;
-            if (bit) ones++;
+            ones += bit;
         }
         
         if (ones >= input.size()/2)
@@ -81,13 +81,15 @@ int main() {
 
     string str;
     int num;
+    int bit;
     int power;
     vector<int> input;
     while (getline(f, str)) {
         num = 0;
         power = 1;
         for (int i = 0; i < str.length(); i++) {
-            num += (str.at(str.length() - 1 - i) - '0') * power;
+            bit = (str.at(str.length() - 1 - i) - '0');
+            num += bit * power;
             power *= 2;
         }
         input.push_back(num);
