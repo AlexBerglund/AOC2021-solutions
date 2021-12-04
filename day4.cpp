@@ -15,8 +15,10 @@ void updateBoards(vector<Board>& boards, int current) {
     }
 }
 
-optional<Board> getWinner(vector<Board> boards) {
+optional<Board> getWinner(const vector<Board>& boards) {
+    
     for (auto& board : boards) {
+        
         // check rows
         for (int i = 0; i < 25; i += 5) {
             int j;
