@@ -29,13 +29,13 @@ int get_digit(const string& input, const map<char, char>& mapping) {
     return -1;
 }
 
-char set_diff(set<char> s1, set<char> s2) {
+char set_diff(const set<char>& s1, const set<char>& s2) {
     set<char> temp_set;
     set_difference(s1.begin(), s1.end(), s2.begin(), s2.end(), inserter(temp_set, temp_set.begin()));
     return *temp_set.begin();
 }
 
-set<char> set_uni(set<char> s1, set<char> s2) {
+set<char> set_uni(const set<char>& s1, const set<char>& s2) {
     set<char> uni_set;
     set_union(s1.begin(), s1.end(), s2.begin(), s2.end(), inserter(uni_set, uni_set.begin()));
     return uni_set;
@@ -172,7 +172,6 @@ map<char, char> build_map(const array<string, 10>& input) {
 
     char mapped_b = set_diff(enc_seg[9], enc_seg[3]);
     mapped.emplace(mapped_b, 'b');
-
 
     temp_set = enc_seg[8];
     temp_set.erase(mapped_e);
