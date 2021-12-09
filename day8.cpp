@@ -15,24 +15,6 @@ struct Entry {
     array<string, 4> output;
 };
 
-int part1(const vector<Entry>& puzzle_input) {
-    int count = 0;
-
-    for (const auto& [_, output] : puzzle_input) {
-        for (const auto& str : output) {
-            switch(str.size()) {
-                case 2:
-                case 3:
-                case 4:
-                case 7:
-                    count++;
-            }
-        }
-    }
-
-    return count;
-}
-
 int get_digit(const string& input, const map<char, char>& mapping) {
     string decrypted;
     for (const char& c : input) {
@@ -45,6 +27,18 @@ int get_digit(const string& input, const map<char, char>& mapping) {
         if (segcodes[i].compare(decrypted) == 0) return i;
     }
     return -1;
+}
+
+char set_diff(set<char> s1, set<char> s2) {
+    set<char> temp_set;
+    set_difference(s1.begin(), s1.end(), s2.begin(), s2.end(), inserter(temp_set, temp_set.begin()));
+    return *temp_set.begin();
+}
+
+set<char> set_uni(set<char> s1, set<char> s2) {
+    set<char> uni_set;
+    set_union(s1.begin(), s1.end(), s2.begin(), s2.end(), inserter(uni_set, uni_set.begin()));
+    return uni_set;
 }
 
 /*
@@ -109,10 +103,8 @@ map<char, char> build_map(const array<string, 10>& input) {
         temp_set.clear();        
     }
 
-    set_difference(enc_seg[7].begin(), enc_seg[7].end(), enc_seg[1].begin(), enc_seg[1].end(), inserter(temp_set, temp_set.begin()));
-    char mapped_a = *temp_set.begin();  
+    char mapped_a = set_diff(enc_seg[7], enc_seg[1]);
     mapped.emplace(mapped_a, 'a');
-    temp_set.clear();
 
     set<char> dce;
     for (const string& code : input) {
@@ -120,15 +112,13 @@ map<char, char> build_map(const array<string, 10>& input) {
             for (const char& c : code) {
                 temp_set.insert(c);
             }
-            set_difference(enc_seg[8].begin(), enc_seg[8].end(), temp_set.begin(), temp_set.end(), inserter(dce, dce.begin()));
+            dce.insert(set_diff(enc_seg[8], temp_set));
             temp_set.clear();
         }
     }
 
-    set_difference(dce.begin(), dce.end(), enc_seg[4].begin(), enc_seg[4].end(), inserter(temp_set, temp_set.begin()));
-    char mapped_e = *temp_set.begin();
+    char mapped_e = set_diff(dce, enc_seg[4]);
     mapped.emplace(mapped_e, 'e');
-    temp_set.clear();
 
     for (const string& code : input) {
         if (code.size() == 6 && code.find(mapped_e) == string::npos) {
@@ -141,9 +131,9 @@ map<char, char> build_map(const array<string, 10>& input) {
         }
     }
 
-    set_difference(enc_seg[9].begin(), enc_seg[9].end(), enc_seg[4].begin(), enc_seg[4].end(), inserter(temp_set, temp_set.begin()));
+    temp_set = enc_seg[9];
     temp_set.erase(mapped_a);
-    char mapped_g = *temp_set.begin();
+    char mapped_g = set_diff(temp_set, enc_seg[4]);
     mapped.emplace(mapped_g, 'g');
     temp_set.clear();
 
@@ -158,7 +148,7 @@ map<char, char> build_map(const array<string, 10>& input) {
         }
     }
 
-    set_union(enc_seg[2].begin(), enc_seg[2].end(), enc_seg[1].begin(), enc_seg[1].end(), inserter(temp_set, temp_set.begin()));
+    temp_set = set_uni(enc_seg[2], enc_seg[1]);
     temp_set.erase(mapped_e);
     enc_seg[3] = temp_set;
     temp_set.clear();
@@ -180,20 +170,19 @@ map<char, char> build_map(const array<string, 10>& input) {
         }
     }
 
-    set_difference(enc_seg[9].begin(), enc_seg[9].end(), enc_seg[3].begin(), enc_seg[3].end(), inserter(temp_set, temp_set.begin()));
-    char mapped_b = *temp_set.begin();
+    char mapped_b = set_diff(enc_seg[9], enc_seg[3]);
     mapped.emplace(mapped_b, 'b');
-    temp_set.clear();
 
-    set_difference(enc_seg[8].begin(), enc_seg[8].end(), enc_seg[5].begin(), enc_seg[5].end(), inserter(temp_set, temp_set.begin()));
+
+    temp_set = enc_seg[8];
     temp_set.erase(mapped_e);
-    char mapped_c = *temp_set.begin();
+    char mapped_c = set_diff(temp_set, enc_seg[5]);
     mapped.emplace(mapped_c, 'c');
     temp_set.clear();
 
-    set_difference(enc_seg[8].begin(), enc_seg[8].end(), enc_seg[2].begin(), enc_seg[2].end(), inserter(temp_set, temp_set.begin()));
+    temp_set = enc_seg[8];
     temp_set.erase(mapped_b);
-    char mapped_f = *temp_set.begin();
+    char mapped_f = set_diff(temp_set, enc_seg[2]);
     mapped.emplace(mapped_f, 'f');
     temp_set.clear();
 
@@ -226,11 +215,28 @@ int solve(const Entry& entry) {
     }
 
     return number;
-
 }
 
-int part2(const vector<Entry>& puzzle_input) {
+int part1(const vector<Entry>& puzzle_input) {
+    int count = 0;
 
+    for (const auto& [_, output] : puzzle_input) {
+        for (const auto& str : output) {
+            switch(str.size()) {
+                case 2:
+                case 3:
+                case 4:
+                case 7:
+                    count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+
+int part2(const vector<Entry>& puzzle_input) {
     int sum = 0;
     
     for (auto& entry : puzzle_input) {
