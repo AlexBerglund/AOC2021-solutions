@@ -50,15 +50,6 @@ int update_aftermath(array<array<int, 10>, 10>& grid) {
     return count;
 }
 
-bool all_zero(const array<array<int, 10>, 10>& grid) {
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            if (grid[i][j] != 0) return false;
-        }
-    }
-    return true;
-}
-
 int part1(array<array<int, 10>, 10> grid, int steps) {
     int total_count = 0;
     int count;
@@ -75,14 +66,17 @@ int part1(array<array<int, 10>, 10> grid, int steps) {
 
 int part2(array<array<int, 10>, 10> grid) {
     int steps = 0;
-    bool any_flashed;
+    int total_step_count;
+    int count;
     while (true) {
         steps++;
-        update_tick(grid);
+        total_step_count = 0;
+        total_step_count += update_tick(grid);
         do {
-            any_flashed = update_aftermath(grid);
-        } while (any_flashed);
-        if (all_zero(grid)) return steps;
+            count = update_aftermath(grid);
+            total_step_count += count;
+        } while (count);
+        if (total_step_count == 100) return steps;
     }
 }
 
