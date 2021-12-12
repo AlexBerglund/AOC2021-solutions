@@ -8,76 +8,69 @@ bool invalid(int y, int x) {
     return (x < 0 || x > 9 || y < 0 || y > 9);
 }
 
-void flash(int y, int x, array<array<int, 10>, 10>& grid, bool first_iter) {
-    grid[y][x] = 0;
+int flash(int y, int x, array<array<int, 10>, 10>& grid) {
+    int count = 1;
     for (int i = y - 1; i <= y + 1; i++) {
         for (int j = x - 1; j <= x + 1; j++) {
-            if (i == y && j == x || invalid(i, j)) continue;
+            int& a = grid[i][j];
+            if (i == y && j == x || invalid(i, j) || a == 10) continue;
 
-            if (!first_iter && grid[i][j] == 0) continue;
+            a++;
 
-            if (grid[i][j] == 0 && i*10 + j < y*10 + x) continue;
-
-            grid[i][j]++;
+            if (a == 10) 
+                count += flash(i, j, grid);
         }
     }
+    return count;
 }
 
-int update_tick(array<array<int, 10>, 10>& grid) {
+int update(array<array<int, 10>, 10>& grid) {
     int count = 0;
     for (int i = 0; i < 10; i++) {
         for (int j = 0; j < 10; j++) {
-            grid[i][j]++;
-            if (grid[i][j] > 9) {
-                flash(i, j, grid, true);  
-                count++;  
-            }
+            int& a = grid[i][j];
+
+            if (a == 10) continue;
+
+            a++;
+
+            if (a == 10) 
+                count += flash(i, j, grid);   
         }
     }
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            if (grid[i][j] == 10) grid[i][j] = 0;
+        }
+    }
+
     return count;
 } 
 
-int update_aftermath(array<array<int, 10>, 10>& grid) {
+int part1(array<array<int, 10>, 10> grid) {
+    
     int count = 0;
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            if (grid[i][j] > 9) {
-                flash(i, j, grid, false);
-                count++;
-            }
-        }
+
+    for (int i = 0; i < 100; i++) {
+        count += update(grid);
     }
+
     return count;
 }
 
-int part1(array<array<int, 10>, 10> grid, int steps) {
-    int total_count = 0;
-    int count;
-    while (steps > 0) {
-        total_count += update_tick(grid);
-        do {
-            count = update_aftermath(grid);
-            total_count += count;
-        } while (count);
-        steps--;
-    }
-    return total_count;
-}
-
 int part2(array<array<int, 10>, 10> grid) {
+    
     int steps = 0;
-    int total_step_count;
     int count;
+
     while (true) {
         steps++;
-        total_step_count = 0;
-        total_step_count += update_tick(grid);
-        do {
-            count = update_aftermath(grid);
-            total_step_count += count;
-        } while (count);
-        if (total_step_count == 100) return steps;
+        count = update(grid);
+        if (count == 100) return steps;
     }
+    
+    return steps;
 }
 
 int main() {
@@ -93,7 +86,7 @@ int main() {
         }
     }
 
-    cout << "Part 1: " << part1(grid, 100) << endl;
+    cout << "Part 1: " << part1(grid) << endl;
     cout << "Part 2: " << part2(grid) << endl;
 
     return 0;
