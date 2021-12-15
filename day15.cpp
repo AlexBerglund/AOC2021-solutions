@@ -10,6 +10,7 @@ class Node {
 public:
     int risk;
     int cost_to_here;
+    int total_cost;
     int index;
     Node(int risk, int cost, int index)
         : risk(risk), cost_to_here(cost), index(index) {}
@@ -22,16 +23,21 @@ public:
         : from(from), to(to) {}
     
     bool operator<(const Edge& e) const {
-        return from.index + to.index + (from.index * to.index) < e.from.index + e.to.index + (e.from.index * e.to.index);
+        return from.index + to.index < e.from.index + e.to.index;
     }
 };
 
 class Compare {
 public:
     bool operator() (const Node& n1, const Node& n2) const {
-        return n1.cost_to_here > n2.cost_to_here;
+        return n1.total_cost > n2.total_cost;
     }
 };
+
+template<size_t N>
+int guess_cost(int cost_to_here, int index) {
+    return cost_to_here + (N - index%N) + (N - index/N);
+}
 
 template<size_t N>
 bool valid(int x, int y) {
@@ -74,6 +80,7 @@ int pathfind(const array<array<int, N>, N>& grid) {
         for (auto& edge : outgoing_edges<N>(grid, current)) {
             if (visited->find(edge) != visited->end()) continue;
 
+            edge.to.total_cost = guess_cost<N>(edge.to.cost_to_here, edge.to.index);
             queue->push(edge.to);
             visited->insert(edge);
         }
